@@ -74,7 +74,7 @@ pi_autheticate <- function(user = Sys.getenv("R_PI_USER")) {
       if (Sys.getenv("R_PI_PASSWORD") != "") {
         Sys.getenv("R_PI_PASSWORD")
       } else if (rstudioapi::isAvailable()) {
-        pass <- rstudioapi::askForPassword(
+        pass <- rstudioapi::askForPassword( # nocov start
           glue::glue("Enter PI password for '{user}':")
         )
 
@@ -82,7 +82,7 @@ pi_autheticate <- function(user = Sys.getenv("R_PI_USER")) {
           rlang::abort("RStudio password dialog cancelled")
         }
 
-        pass
+        pass # nocov end
       } else {
         rlang::abort(
           "No RStudio API found and no password found at environment variable 'R_PI_PASSWORD'"
@@ -164,5 +164,18 @@ pi_url <- function(.con, .fun = NULL, ...) {
     collapse = "/"
   )
 
-  httr::modify_url(url_base, query = rlang::list2(...))
+  query <- rlang::list2(...)
+  query <- query[!vapply(query, is.null, logical(1))]
+  httr::modify_url(url_base, query = query)
+}
+
+#' Extract a Web ID
+#'
+#' @param webId The ID of the object or the object itself.
+#'
+#' @return A character vector of web IDs
+#' @export
+#'
+pi_web_id <- function(webId) {
+  webId
 }

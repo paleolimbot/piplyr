@@ -6,6 +6,11 @@ test_that("connect function works", {
   con <- pi_connect_httpbin()
   expect_is(con, "pi_connection")
   expect_identical(expect_output(print(con), "pi_connection"), con)
+
+  con_auth <- withr::with_envvar(list(R_PI_USER = "user", R_PI_PASSWORD = "pass"), {
+    pi_connect_httpbin()
+  })
+  expect_identical(expect_output(print(con_auth), "pi_connection"), con_auth)
 })
 
 test_that("authenticate function works", {
