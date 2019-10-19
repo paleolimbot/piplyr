@@ -2,14 +2,21 @@
 % Please edit documentation in R/connection.R
 \name{pi_connect}
 \alias{pi_connect}
+\alias{pi_connect_public}
 \title{Connect to the PI web API}
 \usage{
-pi_connect(endpoint, user = Sys.getenv("R_PI_USER"))
+pi_connect(endpoint = Sys.getenv("R_PI_ENDPOINT"),
+  user = Sys.getenv("R_PI_USER"), test = TRUE)
+
+pi_connect_public(test = TRUE)
 }
 \arguments{
 \item{endpoint}{The base URL for the endpoint.}
 
 \item{user}{Username for authentication.}
+
+\item{test}{Use \code{test = FALSE} to skip testing the endpoint/authentication.
+This is used to reduce the number of HTTP calls in the package tests.}
 }
 \value{
 A connection object
@@ -19,5 +26,12 @@ Connects to a web API endpoint, optionally with authentication. \emph{Never stor
 passwords in script files or type them into the console!!!!} Instead, this
 function will propmpt you for a password in RStudio, or you can set the
 R_PI_PASSWORD environment variable (you could do so using
-\code{\link[usethis:edit_r_environ]{usethis::edit_r_environ()}}).
+\code{\link[usethis:edit_r_environ]{usethis::edit_r_environ()}}). Use \code{\link[=pi_connect_public]{pi_connect_public()}} to connect to the
+\href{https://pisquare.osisoft.com/docs/DOC-2653-public-pi-web-api-endpoint}{OSIsoft public web API endpoint}
+(to do so, you'll need to set the R_PI_PUBLIC_USER and R_PI_PUBLIC_PASSWORD
+environment variables).
+}
+\examples{
+pi_connect_public()
+
 }
