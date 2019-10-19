@@ -14,18 +14,21 @@
 #' @export
 #'
 pi_connect <- function(endpoint, user = Sys.getenv("R_PI_USER")) {
-  structure(
+  con <- structure(
     list(
-      endpoint = endpoint,
+      # trip trailing slashes off of the endpoint
+      endpoint = gsub("/+$", "", endpoint),
       user = user,
       auth = pi_autheticate(user)
     ),
     class = "pi_connection"
   )
+
+  # test connection and add base information
+  con$Links <- pi_get(con)$Links
+  con
 }
 
-#' @rdname pi_connect
-#' @export
 pi_autheticate <- function(user = Sys.getenv("R_PI_USER")) {
   if (!is.null(user) && user != "") {
     httr::authenticate(
@@ -33,9 +36,15 @@ pi_autheticate <- function(user = Sys.getenv("R_PI_USER")) {
       if (Sys.getenv("R_PI_PASSWORD") != "") {
         Sys.getenv("R_PI_PASSWORD")
       } else if (rstudioapi::isAvailable()) {
-        rstudioapi::askForPassword(
+        pass <- rstudioapi::askForPassword(
           glue::glue("Enter PI password for '{user}':")
         )
+
+        if (is.null(pass)) {
+          rlang::abort("RStudio password dialog cancelled")
+        }
+
+        pass
       } else {
         rlang::abort(
           "No RStudio API found and no password found at environment variable 'R_PI_PASSWORD'"
@@ -43,13 +52,13 @@ pi_autheticate <- function(user = Sys.getenv("R_PI_USER")) {
       }
     )
   } else {
-    NULL
+    list()
   }
 }
 
-pi_get <- function(con, fun = "", ...) {
+pi_get <- function(con, fun = NULL, ...) {
   response <- httr::GET(
-    glue::glue("{con$endpoint}/{fun}"),
+    paste0(c(con$endpoint, fun), collapse = "/"),
     con$auth
   )
   httr::stop_for_status(response)

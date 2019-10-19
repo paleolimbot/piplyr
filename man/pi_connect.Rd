@@ -2,12 +2,9 @@
 % Please edit documentation in R/connection.R
 \name{pi_connect}
 \alias{pi_connect}
-\alias{pi_autheticate}
 \title{Connect to the PI web API}
 \usage{
 pi_connect(endpoint, user = Sys.getenv("R_PI_USER"))
-
-pi_autheticate(user = Sys.getenv("R_PI_USER"))
 }
 \arguments{
 \item{endpoint}{The base URL for the endpoint.}
